@@ -58,15 +58,18 @@ final class SpoonUtils {
   }
 
   /** Get a {@link FileEntry} for an arbitrary path. */
-  static FileEntry obtainDirectoryFileEntry(String path) {
+  static FileEntry obtainFileEntryForPath(String path, int type) {
     try {
       FileEntry lastEntry = null;
       Constructor<FileEntry> c =
           FileEntry.class.getDeclaredConstructor(FileEntry.class, String.class, int.class,
               boolean.class);
       c.setAccessible(true);
-      for (String part : path.split("/")) {
-        lastEntry = c.newInstance(lastEntry, part, TYPE_DIRECTORY, lastEntry == null);
+      String[] split = path.split("/");
+      for (int i = 0, count = split.length; i < count; i++) {
+        String part = split[i];
+        int partType = (i == count - 1) ? type : TYPE_DIRECTORY;
+        lastEntry = c.newInstance(lastEntry, part, partType, lastEntry == null);
       }
       return lastEntry;
     } catch (NoSuchMethodException ignored) {
